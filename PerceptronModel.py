@@ -26,11 +26,12 @@ class Perceptron:
         # Add column of 1s
         X = np.concatenate([X, np.ones((n_samples, 1))], axis=1)
         y = np.matmul(X, self.weights)
+        class_weights = y
         y = np.vectorize(lambda val: 1 if val > 0 else -1)(y)
         
-        return y
+        return y, class_weights
     
     def score(self, X, y):
-        pred_y = self.predict(X)
+        pred_y, class_weights = self.predict(X)
         
-        return np.mean(y == pred_y)
+        return pred_y, np.mean(y == pred_y), class_weights
