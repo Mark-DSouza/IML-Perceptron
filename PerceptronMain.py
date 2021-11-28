@@ -1,17 +1,8 @@
 # Perceptron on Linearly Separable
-from matplotlib import pyplot as plt
-from random import seed
-from random import randrange
-from math import sqrt
-from math import exp
-from math import pi
-from pprint import pprint
-
-from numpy.core import numeric
-from utils import load_class_data
-# from planar_utils import load_planar_dataset, plot_decision_boundary
-import sklearn
 import numpy as np
+
+from matplotlib import pyplot as plt
+from utils import load_class_data
 from PerceptronModel import Perceptron
 
 
@@ -22,6 +13,7 @@ def load_data(type, classcount, dirname):
 			f"class{i+1}_{type}.txt" for i in range(classcount)
 		] 
 	]
+
 
 # Plot of training data with mean displayed in different color
 def plot_dataset(separated_dataset, title, plot_no):
@@ -42,7 +34,6 @@ def plot_dataset(separated_dataset, title, plot_no):
 		plt.scatter(x_mean,y_mean, c=mean_colors[class_ind],label="class "+str(class_ind+1)+" mean")
 		plt.legend(loc=0)
 
-	# plt.show()
 
 # Calculate the mean of a list of numbers
 def mean(numbers):
@@ -78,7 +69,6 @@ def plot_result(X, Y, title, plot_no, positive_class_label="positive class", neg
 			
 	positive_class = positive_class.reshape((int (positive_class.shape[0] / 2), 2))
 	negative_class = negative_class.reshape((int (negative_class.shape[0] / 2), 2))
-	# print(positive_class.shape, negative_class.shape)
 
 	x = [point[0] for point in positive_class]
 	y = [point[1] for point in positive_class]
@@ -93,3 +83,22 @@ def plot_result(X, Y, title, plot_no, positive_class_label="positive class", neg
 
 def final_accuracy(y_test, result):
 	return np.mean(y_test == result)
+
+def plot_decision_boundary(perceptron, X, y, colormap):
+	X = X.T
+	# Set min and max values and give it some padding
+	x_min, x_max = X[0, :].min() - 1, X[0, :].max() + 1
+	y_min, y_max = X[1, :].min() - 1, X[1, :].max() + 1
+	h_x = (x_max-x_min)/100
+	h_y = (y_max-y_min)/100
+	# Generate a grid of points with distance h between them
+	xx, yy = np.meshgrid(np.arange(x_min, x_max, h_x), np.arange(y_min, y_max, h_y))
+	# Predict the function value for the whole grid
+	final_y, _, _, _ = perceptron.score(np.c_[xx.ravel(), yy.ravel()], y)
+	Z = final_y
+	Z = Z.reshape(xx.shape)
+	# Plot the contour and training examples
+	plt.contourf(xx, yy, Z, alpha=0.25, cmap=colormap)
+	plt.ylabel('x2')
+	plt.xlabel('x1')
+	plt.scatter(X[0, :], X[1, :], c=y, cmap=colormap)

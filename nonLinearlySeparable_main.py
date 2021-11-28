@@ -5,25 +5,8 @@ from PerceptronMain import Perceptron
 from PerceptronMain import plot_dataset
 from PerceptronMain import load_data
 from PerceptronMain import plot_result
+from PerceptronMain import plot_decision_boundary
 
-def plot_decision_boundary(perceptron, X, y, colormap):
-	X = X.T
-	# Set min and max values and give it some padding
-	x_min, x_max = X[0, :].min() - 1, X[0, :].max() + 1
-	y_min, y_max = X[1, :].min() - 1, X[1, :].max() + 1
-	h_x = (x_max-x_min)/100
-	h_y = (y_max-y_min)/100
-	# Generate a grid of points with distance h between them
-	xx, yy = np.meshgrid(np.arange(x_min, x_max, h_x), np.arange(y_min, y_max, h_y))
-	# Predict the function value for the whole grid
-	final_y, _, _, _ = perceptron.score(np.c_[xx.ravel(), yy.ravel()], y)
-	Z = final_y
-	Z = Z.reshape(xx.shape)
-	# Plot the contour and training examples
-	plt.contourf(xx, yy, Z, alpha=0.25, cmap=colormap)
-	plt.ylabel('x2')
-	plt.xlabel('x1')
-	plt.scatter(X[0, :], X[1, :], c=y, cmap=colormap)
 
 def calculate_confusion_matrix(y_test, y_pred):
 	y_pred = np.vectorize(lambda x: 1 if x==1 else 2)(y_pred)
