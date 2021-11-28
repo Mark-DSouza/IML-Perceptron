@@ -7,48 +7,14 @@ from PerceptronMain import plot_one_vs_all
 from PerceptronMain import plot_result
 from PerceptronMain import final_accuracy
 
-# def plot_final_result(X, Y, title, plot_no):
-# 	plt.figure(plot_no, figsize=(8,5))
-# 	plt.title(title)
-# 	colors = ['b', 'g', 'r' ]
-
-# 	first_class = np.array([])
-# 	second_class = np.array([])
-# 	third_class = np.array([])
-# 	for index in range(Y.shape[0]):
-# 		if Y[index] == 0:
-# 			first_class = np.append(first_class, X[index])
-# 		elif Y[index] == 1:
-# 			second_class = np.append(second_class, X[index])
-
-# 	first_class = first_class.reshape((int (first_class.shape[0] / 2), 2))
-# 	second_class = second_class.reshape((int (second_class.shape[0] / 2), 2))
-# 	# third_class = third_class.reshape((int (third_class.shape[0] / 2), 2))
-		
-# 	x = [point[0] for point in first_class]
-# 	y = [point[1] for point in first_class]
-# 	plt.scatter(x,y, c=colors[0],label="class 0")
-
-# 	x = [point[0] for point in second_class]
-# 	y = [point[1] for point in second_class]
-# 	plt.scatter(x,y, c=colors[1],label="class 1")
-
-# 	# x = [point[0] for point in third_class]
-# 	# y = [point[1] for point in third_class]
-# 	# plt.scatter(x,y, c=colors[2],label="class 2")
-
-# 	plt.legend(loc=0)
-
-
-def nonLinearlySeparable():
+def nonLinearlySeparable(dirname):
 	plot_no = 0
 	class_count = 2
-	dirname = "nonLinearlySeparable/"
+	# dirname = "nonLinearlySeparable/"
 
 
 	# Load and show training data
 	separated_train = load_data("train", class_count, dirname)
-	# pprint(separated_train)
 	plot_dataset(separated_train, "Training data", plot_no)
 	plot_no += 1
 

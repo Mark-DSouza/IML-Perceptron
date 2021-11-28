@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from class_vs_class import class_vs_class
 import numpy as np
 from PerceptronModel import Perceptron
 from PerceptronMain import plot_dataset
@@ -29,29 +30,28 @@ def plot_final_result(X, Y, title, plot_no):
 		
 	x = [point[0] for point in first_class]
 	y = [point[1] for point in first_class]
-	plt.scatter(x,y, c=colors[0],label="class 0")
+	plt.scatter(x,y, c=colors[0],label="class 1")
 
 	x = [point[0] for point in second_class]
 	y = [point[1] for point in second_class]
-	plt.scatter(x,y, c=colors[1],label="class 1")
+	plt.scatter(x,y, c=colors[1],label="class 2")
 
 	x = [point[0] for point in third_class]
 	y = [point[1] for point in third_class]
-	plt.scatter(x,y, c=colors[2],label="class 2")
+	plt.scatter(x,y, c=colors[2],label="class 3")
 
 	plt.legend(loc=0)
 
 
-def linearlySeparable():
+def linearlySeparable(dirname):
 	plot_no = 0
 	class_count = 3
-	dirname = "linearlySeparable/"
+	# dirname = "linearlySeparable/"
 	# dirname = "overlapping/"
 
 
 	# Load and show training data
 	separated_train = load_data("train", class_count, dirname)
-	# pprint(separated_train)
 	plot_dataset(separated_train, "Training data", plot_no)
 	plot_no += 1
 
@@ -64,10 +64,6 @@ def linearlySeparable():
 	list_y_test = list()
 
 	for current_class in range(class_count):
-		plot_one_vs_all(separated_dataset=separated_train, title="train", current_class=current_class, plot_no=plot_no)
-		plot_no += 1
-
-
 		train_set = list() # list of rows
 		actual_y = list()
 		for y, classdata in enumerate(separated_train):
@@ -79,7 +75,6 @@ def linearlySeparable():
 					actual_y.append(-1)
 
 		number_train = len(actual_y)
-		print(number_train)
 		X_train = np.array(train_set)
 		y_train = np.array(actual_y)
 
@@ -99,7 +94,6 @@ def linearlySeparable():
 		number_test = len(predicted_y)
 		if current_class == 0:
 			y_final  = np.empty((number_test, 1))
-		print(number_test)
 		X_test = np.array(test_set)
 		y_test = np.array(predicted_y)
 		
@@ -109,8 +103,8 @@ def linearlySeparable():
 
 		y_final = np.concatenate((y_final, X_cross_weights.reshape((number_test, 1))), axis=1)
 
-		plot_result(X_test, pred_y, "Result of test prediction", plot_no)
-		plot_no += 1
+		# plot_result(X_test, pred_y, "Result of test prediction", plot_no)
+		# plot_no += 1
 
 
 	y_final = np.delete(y_final, 0, 1) #not important
@@ -129,7 +123,17 @@ def linearlySeparable():
 	plot_no += 1
 
 
-	list_y_test = np.array(list_y_test)
+	list_y_test = np.array(list_y_test) # to computer overall accuracy
 	list_y_test = list_y_test.reshape((list_y_test.shape[0], 1))
-	print(final_accuracy(list_y_test, result)) # To find accuracy
+	print(f"The Overall accuracy of the multi-class model is {final_accuracy(list_y_test, result) * 100}%")
+
+	for i in range(class_count):
+		for j in range(i+1, class_count):
+			class_vs_class(separated_train=separated_train, separated_test=separated_test, class1=i, class2=j, plot_no=plot_no)
+			plot_no+=3
+	# class_vs_class(separated_train=separated_train, separated_test=separated_test, class1=0, class2=1, plot_no=plot_no)
+	# class_vs_class(separated_train=separated_train, separated_test=separated_test, class1=0, class2=2, plot_no=plot_no)
+	# class_vs_class(separated_train=separated_train, separated_test=separated_test, class1=1, class2=2, plot_no=plot_no)
+	# plot_no+=2
+
 	plt.show()

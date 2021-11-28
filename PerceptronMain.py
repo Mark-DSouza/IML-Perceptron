@@ -78,7 +78,7 @@ def plot_result(X, Y, title, plot_no, positive_class_label="positive class", neg
 			
 	positive_class = positive_class.reshape((int (positive_class.shape[0] / 2), 2))
 	negative_class = negative_class.reshape((int (negative_class.shape[0] / 2), 2))
-	print(positive_class.shape, negative_class.shape)
+	# print(positive_class.shape, negative_class.shape)
 
 	x = [point[0] for point in positive_class]
 	y = [point[1] for point in positive_class]
