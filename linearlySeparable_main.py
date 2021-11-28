@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from matplotlib.colors import ListedColormap
 from class_vs_class import class_vs_class
 import numpy as np
 from PerceptronModel import Perceptron
@@ -7,6 +8,35 @@ from PerceptronMain import load_data
 from PerceptronMain import plot_one_vs_all
 from PerceptronMain import plot_result
 from PerceptronMain import final_accuracy
+
+def plot_decision_boundary(weights_matrix, X, y, colormap):
+	X = X.T
+	# print(X.shape)
+	# Set min and max values and give it some padding
+	x_min, x_max = X[0, :].min() - 1, X[0, :].max() + 1
+	y_min, y_max = X[1, :].min() - 1, X[1, :].max() + 1
+	h_x = (x_max-x_min)/100
+	h_y = (y_max-y_min)/100
+	# Generate a grid of points with distance h between them
+	xx, yy = np.meshgrid(np.arange(x_min, x_max, h_x), np.arange(y_min, y_max, h_y))
+	# Predict the function value for the whole grid
+	Z = predict_mark(np.c_[xx.ravel(), yy.ravel()], weights_matrix)
+	Z = Z.reshape(xx.shape)
+	# Plot the contour and training examples
+	plt.contourf(xx, yy, Z, alpha=0.25, cmap=colormap)
+	plt.ylabel('x2')
+	plt.xlabel('x1')
+	plt.scatter(X[0, :], X[1, :], c=y, cmap=colormap)
+
+def predict(x, mean_vector_list, cov_matrix_list):
+	x = np.array(x).reshape((2,1))
+	prob_values = [ descriminator_fn(x, mean_vector_list[i], cov_matrix_list[i]) for i in range(len(mean_vector_list)) ]
+	best_label = np.argmax(prob_values, axis=None)
+
+	return best_label
+
+def predict_all(X, mean_vector, cov_matrix):
+	return np.array([ predict(x, mean_vector, cov_matrix) for x in X ])
 
 def plot_final_result(X, Y, title, plot_no):
 	plt.figure(plot_no, figsize=(8,5))
@@ -109,6 +139,27 @@ def display_metrics(y_test, y_pred, class_count=3):
 	print(f"Mean F1-score is {f1_sum/class_count:.4f}")
 	print()
 
+def predict_mark(X, weights_matrix):
+	print(X.shape, weights_matrix.shape)
+	n_samples = X.shape[0]
+	print(n_samples)
+	X = np.concatenate([X, np.ones((n_samples, 1))], axis=1)
+	print(X.shape)
+	y = np.matmul(X, weights_matrix)
+	print(y.shape)
+	labels = list()
+	for index in range(y.shape[0]):
+		if (y[index][0] > y[index][1]) and (y[index][0] > y[index][2]):
+			labels.append(0)
+		elif (y[index][1] > y[index][2]) and (y[index][1] > y[index][0]):
+			labels.append(1)
+		else:
+			labels.append(2)
+	labels = np.array(labels)
+	print(labels.shape)
+
+	return labels.reshape((n_samples, 1))
+
 def linearlySeparable(dirname):
 	plot_no = 0
 	class_count = 3
@@ -120,6 +171,13 @@ def linearlySeparable(dirname):
 	separated_train = load_data("train", class_count, dirname)
 	plot_dataset(separated_train, "Training data", plot_no)
 	plot_no += 1
+
+	train_set_X_train = list() # list of rows
+	train_actual_y_train = list()
+	for y, classdata in enumerate(separated_train):
+		for datapoint in classdata:
+			train_set_X_train.append(datapoint)
+			train_actual_y_train.append(y)
 
 	separated_test = load_data("test", class_count, dirname)
 	plot_dataset(separated_test, "Testing data", plot_no)
@@ -158,22 +216,26 @@ def linearlySeparable(dirname):
 					predicted_y.append(-1)
 
 		number_test = len(predicted_y)
-		if current_class == 0:
-			y_final  = np.empty((number_test, 1))
 		X_test = np.array(test_set)
 		y_test = np.array(predicted_y)
+		if current_class == 0:
+			y_final  = np.empty((number_test, 1))
+			weights_final = list()
 		
 		perceptron = Perceptron()
 		perceptron.fit(X_train, y_train, 100)
-		pred_y, accuracy, X_cross_weights = perceptron.score(X_test, y_test)
+		pred_y, accuracy, X_cross_weights, weights = perceptron.score(X_test, y_test)
 
 		y_final = np.concatenate((y_final, X_cross_weights.reshape((number_test, 1))), axis=1)
-
+		weights_final.append(weights)
 		# plot_result(X_test, pred_y, "Result of test prediction", plot_no)
 		# plot_no += 1
 
 
 	y_final = np.delete(y_final, 0, 1) #not important
+	weights_final = np.array(weights_final)
+	weights_final = weights_final.T
+	answers = predict_mark(X_test, weights_final)
 	result = list()
 	for index in range(y_final.shape[0]):
 		if (y_final[index][0] > y_final[index][1]) and (y_final[index][0] > y_final[index][2]):
@@ -191,6 +253,7 @@ def linearlySeparable(dirname):
 
 	list_y_test = np.array(list_y_test) # to computer overall accuracy
 	list_y_test = list_y_test.reshape((list_y_test.shape[0], 1))
+	print(f"This is the answer {np.mean(answers == list_y_test)}")
 	print(f"The Overall accuracy of the multi-class model is {final_accuracy(list_y_test, result) * 100}%")
 
 	display_metrics(list_y_test, result)
@@ -203,5 +266,20 @@ def linearlySeparable(dirname):
 	# class_vs_class(separated_train=separated_train, separated_test=separated_test, class1=0, class2=2, plot_no=plot_no)
 	# class_vs_class(separated_train=separated_train, separated_test=separated_test, class1=1, class2=2, plot_no=plot_no)
 	# plot_no+=2
+
+	plt.figure(plot_no, figsize=(8,5))
+	plot_no += 1
+	plt.title("Train data - All classes superimposed")
+	plot_decision_boundary(
+		weights_final,np.array(train_set_X_train), 
+		np.array(train_actual_y_train), 
+		colormap=ListedColormap(['r', 'g', 'b'])
+	)
+	# plot_decision_boundary(
+	# 	weights_final,np.array(train_set_X_train), 
+	# 	np.array(train_actual_y_train), 
+	# 	colormap=ListedColormap(['r', 'g', 'b'])
+	# )
+	# plot_decision_boundary(lambda X: predict_all(X, weights), X_train, Y_train, colormap=ListedColormap(colors))
 
 	plt.show()

@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from matplotlib.colors import ListedColormap
 from numpy.core import numeric
 from utils import load_class_data
 from planar_utils import load_planar_dataset, plot_decision_boundary
@@ -6,6 +7,28 @@ import sklearn
 import numpy as np
 from PerceptronModel import Perceptron
 from PerceptronMain import plot_result
+
+def plot_decision_boundary(perceptron, X, y, colormap):
+	X = X.T
+	# print(X.shape)
+	# Set min and max values and give it some padding
+	x_min, x_max = X[0, :].min() - 1, X[0, :].max() + 1
+	y_min, y_max = X[1, :].min() - 1, X[1, :].max() + 1
+	h_x = (x_max-x_min)/100
+	h_y = (y_max-y_min)/100
+	# Generate a grid of points with distance h between them
+	xx, yy = np.meshgrid(np.arange(x_min, x_max, h_x), np.arange(y_min, y_max, h_y))
+	# Predict the function value for the whole grid
+	final_y, accuracy, actual_predictions, weights = perceptron.score(np.c_[xx.ravel(), yy.ravel()])
+	Z = final_y
+	Z = Z.reshape(xx.shape)
+	# Plot the contour and training examples
+	plt.contourf(xx, yy, Z, alpha=0.25, cmap=colormap)
+	plt.ylabel('x2')
+	plt.xlabel('x1')
+	plt.scatter(X[0, :], X[1, :], c=y, cmap=colormap)
+
+
 
 def plot_class_vs_class(separated_dataset, title, class1, class2, plot_no):
 	plt.figure(plot_no, figsize=(8,5))
@@ -56,8 +79,9 @@ def class_vs_class(separated_train, separated_test, class1, class2, plot_no):
 	
 	perceptron = Perceptron()
 	perceptron.fit(X_train, y_train, 100)
-	final_y, accuracy, actual_predictions = perceptron.score(X_test, y_test)
+	final_y, accuracy, actual_predictions, weights = perceptron.score(X_test, y_test)
 
+	plot_decision_boundary(perceptron, X_test, y_test, colormap=ListedColormap(['r', 'g', 'b']))
 	print(f"The accuray of class {class1+1} VS class {class2+1} is {accuracy*100}%")
 	plot_result(X_test, final_y, f"class {class1+1} VS class {class2+1} Predictions on Test Dataset", plot_no+2, f"{class1+1}", f"{class2+1}")
 	

@@ -35,4 +35,4 @@ class Perceptron:
         pred_y, X_dot_weights = self.predict(X)
         accuracy = np.mean(y == pred_y)
         
-        return pred_y, accuracy, X_dot_weights
+        return pred_y, accuracy, X_dot_weights, self.weights
