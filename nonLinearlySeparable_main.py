@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from matplotlib.colors import ListedColormap
 import numpy as np
 from PerceptronMain import Perceptron
 from PerceptronMain import plot_dataset
@@ -6,6 +7,26 @@ from PerceptronMain import load_data
 from PerceptronMain import plot_one_vs_all
 from PerceptronMain import plot_result
 from PerceptronMain import final_accuracy
+
+def plot_decision_boundary(perceptron, X, y, colormap):
+	X = X.T
+	# print(X.shape)
+	# Set min and max values and give it some padding
+	x_min, x_max = X[0, :].min() - 1, X[0, :].max() + 1
+	y_min, y_max = X[1, :].min() - 1, X[1, :].max() + 1
+	h_x = (x_max-x_min)/100
+	h_y = (y_max-y_min)/100
+	# Generate a grid of points with distance h between them
+	xx, yy = np.meshgrid(np.arange(x_min, x_max, h_x), np.arange(y_min, y_max, h_y))
+	# Predict the function value for the whole grid
+	final_y, _, _, _ = perceptron.score(np.c_[xx.ravel(), yy.ravel()], y)
+	Z = final_y
+	Z = Z.reshape(xx.shape)
+	# Plot the contour and training examples
+	plt.contourf(xx, yy, Z, alpha=0.25, cmap=colormap)
+	plt.ylabel('x2')
+	plt.xlabel('x1')
+	plt.scatter(X[0, :], X[1, :], c=y, cmap=colormap)
 
 def calculate_confusion_matrix(y_test, y_pred):
 	y_pred = np.vectorize(lambda x: 1 if x==1 else 2)(y_pred)
@@ -118,11 +139,22 @@ def nonLinearlySeparable(dirname):
 	
 	perceptron = Perceptron()
 	perceptron.fit(X_train, y_train, 100)
-	pred_y, accuracy, X_cross_weights = perceptron.score(X_test, y_test)
+	pred_y, accuracy, _, _ = perceptron.score(X_test, y_test)
 
 	plot_result(X_test, pred_y, "Result of model on Test Dataset", plot_no, "Class 1", "Class 2")
 	plot_no += 1
 
 	print(f"Accuracy of the model of Test Dataset is {accuracy * 100}%");
 	display_metrics(y_test, pred_y)
+
+	plt.figure(plot_no, figsize=(8,5))
+	plot_no += 1
+	plt.title(f"class 1 VS class 2 Decision Region on Training Dataset")
+	plot_decision_boundary(perceptron, X_train, y_train, colormap=ListedColormap(['r', 'g', 'b']))
+	
+	
+	plt.figure(plot_no, figsize=(8,5))
+	plot_no += 1
+	plt.title(f"class 1 VS class 2 Decision Region on Test Dataset")
+	plot_decision_boundary(perceptron, X_test, y_test, colormap=ListedColormap(['r', 'g', 'b']))
 	plt.show()

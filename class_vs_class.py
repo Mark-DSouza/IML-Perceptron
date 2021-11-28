@@ -19,7 +19,7 @@ def plot_decision_boundary(perceptron, X, y, colormap):
 	# Generate a grid of points with distance h between them
 	xx, yy = np.meshgrid(np.arange(x_min, x_max, h_x), np.arange(y_min, y_max, h_y))
 	# Predict the function value for the whole grid
-	final_y, accuracy, actual_predictions, weights = perceptron.score(np.c_[xx.ravel(), yy.ravel()], y)
+	final_y, _, _, _ = perceptron.score(np.c_[xx.ravel(), yy.ravel()], y)
 	Z = final_y
 	Z = Z.reshape(xx.shape)
 	# Plot the contour and training examples
