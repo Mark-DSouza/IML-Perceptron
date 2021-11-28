@@ -42,6 +42,72 @@ def plot_final_result(X, Y, title, plot_no):
 
 	plt.legend(loc=0)
 
+def calculate_confusion_matrix(y_test, y_pred):
+	y_pred = np.vectorize(lambda x: 1 if x==0 else (2 if x==1 else 3))(y_pred)
+	y_test = np.vectorize(lambda x: 1 if x==0 else (2 if x==1 else 3))(y_test)
+	actual_ones = np.vectorize(lambda val: 1 if val == 1 else 0)(y_test)
+	elementwiseWithOne = np.multiply(actual_ones, y_pred)
+	confusion1comma1 = np.mean(elementwiseWithOne == 1)
+	confusion1comma2 = np.mean(elementwiseWithOne == 2)
+	confusion1comma3 = np.mean(elementwiseWithOne == 3)
+	print(confusion1comma1, confusion1comma2, confusion1comma3)
+
+	actual_twos = np.vectorize(lambda val: 1 if val == 2 else 0)(y_test)
+	elementwiseWithTwo = np.multiply(actual_twos, y_pred)
+	confusion2comma1 = np.mean(elementwiseWithTwo == 1)
+	confusion2comma2 = np.mean(elementwiseWithTwo == 2)
+	confusion2comma3 = np.mean(elementwiseWithTwo == 3)
+	print(confusion2comma1, confusion2comma2, confusion2comma3)
+
+	actual_threes = np.vectorize(lambda val: 1 if val == 3 else 0)(y_test)
+	elementwiseWithThree = np.multiply(actual_threes, y_pred)
+	confusion3comma1 = np.mean(elementwiseWithThree == 1)
+	confusion3comma2 = np.mean(elementwiseWithThree == 2)
+	confusion3comma3 = np.mean(elementwiseWithThree == 3)
+	print(confusion3comma1, confusion3comma2, confusion3comma3)
+
+	return [
+		[confusion1comma1, confusion1comma2, confusion1comma3],
+		[confusion2comma1, confusion2comma2, confusion2comma3],
+		[confusion3comma1, confusion3comma2, confusion3comma3],
+	]
+
+def display_metrics(y_test, y_pred, class_count=3):
+	conf_mat = calculate_confusion_matrix(y_test, y_pred)
+	print()
+	print("Confusion Matrix:")
+	print("-----------------")
+	print(f"                Predicted Class 1 | Predicted Class 2 | Predicted Class 3")
+	for i in range(class_count):
+		print(f"Actual class {i+1}:", end="")
+		for j in range(class_count):
+			print(f"{conf_mat[i][j]*100:17.4f} %", end="")
+		print()
+	print()
+	prec_sum = 0
+	rec_sum = 0
+	f1_sum = 0
+	for class_label in range(class_count):
+		correctly_predicted_as_positive = conf_mat[class_label][class_label]
+		total_predicted_as_positive = sum([conf_mat[i][class_label] for i in range(class_count)])
+		total_actual_positive = sum([conf_mat[class_label][i] for i in range(class_count)])
+
+		prec = correctly_predicted_as_positive/total_predicted_as_positive
+		rec = correctly_predicted_as_positive/total_actual_positive
+
+		f1_score = 2*prec*rec/(prec+rec)
+		prec_sum += prec
+		rec_sum += rec
+		f1_sum += f1_score
+		
+		print(f"Class {class_label+1}: ", end="")
+		print(f"Precision = {prec:8.4f}, Recall = {rec:8.4f}, F1-score = {f1_score:8.4f}")
+
+	print()
+	print(f"Mean precision is {prec_sum/class_count:.4f}")
+	print(f"Mean recall is {rec_sum/class_count:.4f}")
+	print(f"Mean F1-score is {f1_sum/class_count:.4f}")
+	print()
 
 def linearlySeparable(dirname):
 	plot_no = 0
@@ -126,6 +192,8 @@ def linearlySeparable(dirname):
 	list_y_test = np.array(list_y_test) # to computer overall accuracy
 	list_y_test = list_y_test.reshape((list_y_test.shape[0], 1))
 	print(f"The Overall accuracy of the multi-class model is {final_accuracy(list_y_test, result) * 100}%")
+
+	display_metrics(list_y_test, result)
 
 	for i in range(class_count):
 		for j in range(i+1, class_count):
