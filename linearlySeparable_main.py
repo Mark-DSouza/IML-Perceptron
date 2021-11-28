@@ -183,6 +183,13 @@ def linearlySeparable(dirname):
 	plot_dataset(separated_test, "Testing data", plot_no)
 	plot_no += 1
 
+	test_set_X_test = list() # list of rows
+	test_actual_y_test = list()
+	for y, classdata in enumerate(separated_test):
+		for datapoint in classdata:
+			test_set_X_test.append(datapoint)
+			test_actual_y_test.append(y)
+
 	number_train = 0
 	number_test = 0
 	list_y_test = list()
@@ -273,6 +280,15 @@ def linearlySeparable(dirname):
 	plot_decision_boundary(
 		weights_final,np.array(train_set_X_train), 
 		np.array(train_actual_y_train), 
+		colormap=ListedColormap(['r', 'g', 'b'])
+	)
+
+	plt.figure(plot_no, figsize=(8,5))
+	plot_no += 1
+	plt.title("Test data - All classes superimposed")
+	plot_decision_boundary(
+		weights_final,np.array(test_set_X_test), 
+		np.array(test_actual_y_test), 
 		colormap=ListedColormap(['r', 'g', 'b'])
 	)
 	# plot_decision_boundary(
