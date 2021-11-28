@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 from numpy.core import numeric
 from utils import load_class_data
-from planar_utils import load_planar_dataset, plot_decision_boundary
+# from planar_utils import load_planar_dataset, plot_decision_boundary
 import sklearn
 import numpy as np
 from PerceptronModel import Perceptron
@@ -85,7 +85,9 @@ def class_vs_class(separated_train, separated_test, class1, class2, plot_no):
 	plot_result(X_test, final_y, f"class {class1+1} VS class {class2+1} Predictions on Test Dataset", plot_no+2, f"{class1+1}", f"{class2+1}")
 	
 	plt.figure(plot_no+3, figsize=(8,5))
+	plt.title(f"class {class1+1} VS class {class2+1} Decision Region on Training Dataset")
+	plot_decision_boundary(perceptron, X_train, y_train, colormap=ListedColormap(['r', 'g', 'b']))
+
+	plt.figure(plot_no+4, figsize=(8,5))
 	plt.title(f"class {class1+1} VS class {class2+1} Decision Region on Test Dataset")
 	plot_decision_boundary(perceptron, X_test, y_test, colormap=ListedColormap(['r', 'g', 'b']))
-
-	

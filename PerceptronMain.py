@@ -9,7 +9,7 @@ from pprint import pprint
 
 from numpy.core import numeric
 from utils import load_class_data
-from planar_utils import load_planar_dataset, plot_decision_boundary
+# from planar_utils import load_planar_dataset, plot_decision_boundary
 import sklearn
 import numpy as np
 from PerceptronModel import Perceptron

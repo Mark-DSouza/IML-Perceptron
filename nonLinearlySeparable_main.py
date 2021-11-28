@@ -4,13 +4,10 @@ import numpy as np
 from PerceptronMain import Perceptron
 from PerceptronMain import plot_dataset
 from PerceptronMain import load_data
-from PerceptronMain import plot_one_vs_all
 from PerceptronMain import plot_result
-from PerceptronMain import final_accuracy
 
 def plot_decision_boundary(perceptron, X, y, colormap):
 	X = X.T
-	# print(X.shape)
 	# Set min and max values and give it some padding
 	x_min, x_max = X[0, :].min() - 1, X[0, :].max() + 1
 	y_min, y_max = X[1, :].min() - 1, X[1, :].max() + 1
@@ -35,13 +32,11 @@ def calculate_confusion_matrix(y_test, y_pred):
 	elementwiseWithOne = np.multiply(actual_ones, y_pred)
 	confusion1comma1 = np.mean(elementwiseWithOne == 1)
 	confusion1comma2 = np.mean(elementwiseWithOne == 2)
-	print(confusion1comma1, confusion1comma2)
 
 	actual_twos = np.vectorize(lambda val: 1 if val == 2 else 0)(y_test)
 	elementwiseWithTwo = np.multiply(actual_twos, y_pred)
 	confusion2comma1 = np.mean(elementwiseWithTwo == 1)
 	confusion2comma2 = np.mean(elementwiseWithTwo == 2)
-	print(confusion2comma1, confusion2comma2)
 
 	return [
 		[confusion1comma1, confusion1comma2],
@@ -116,9 +111,6 @@ def nonLinearlySeparable(dirname):
 	number_train = len(actual_y)
 	X_train = np.array(train_set)
 	y_train = np.array(actual_y)
-	print(f"The number of training samples is {number_train}")
-	print(f"The shape of X_train is {X_train.shape}")
-	print(f"The shape of y_train is {y_train.shape}")
 
 	test_set = list() # list of rows
 	predicted_y = list()
@@ -133,9 +125,6 @@ def nonLinearlySeparable(dirname):
 	number_test = len(predicted_y)
 	X_test = np.array(test_set)
 	y_test = np.array(predicted_y)
-	print(f"The number of training samples is {number_test}")
-	print(f"The shape of X_train is {X_test.shape}")
-	print(f"The shape of y_train is {y_test.shape}")
 	
 	perceptron = Perceptron()
 	perceptron.fit(X_train, y_train, 100)
@@ -150,11 +139,11 @@ def nonLinearlySeparable(dirname):
 	plt.figure(plot_no, figsize=(8,5))
 	plot_no += 1
 	plt.title(f"class 1 VS class 2 Decision Region on Training Dataset")
-	plot_decision_boundary(perceptron, X_train, y_train, colormap=ListedColormap(['r', 'g', 'b']))
+	plot_decision_boundary(perceptron, X_train, y_train, colormap=ListedColormap(['b', 'g', 'r']))
 	
 	
 	plt.figure(plot_no, figsize=(8,5))
 	plot_no += 1
 	plt.title(f"class 1 VS class 2 Decision Region on Test Dataset")
-	plot_decision_boundary(perceptron, X_test, y_test, colormap=ListedColormap(['r', 'g', 'b']))
+	plot_decision_boundary(perceptron, X_test, y_test, colormap=ListedColormap(['b', 'g', 'r']))
 	plt.show()
