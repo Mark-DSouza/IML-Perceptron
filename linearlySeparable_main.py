@@ -261,7 +261,7 @@ def linearlySeparable(dirname):
 	for i in range(class_count):
 		for j in range(i+1, class_count):
 			class_vs_class(separated_train=separated_train, separated_test=separated_test, class1=i, class2=j, plot_no=plot_no)
-			plot_no+=3
+			plot_no+=4
 	# class_vs_class(separated_train=separated_train, separated_test=separated_test, class1=0, class2=1, plot_no=plot_no)
 	# class_vs_class(separated_train=separated_train, separated_test=separated_test, class1=0, class2=2, plot_no=plot_no)
 	# class_vs_class(separated_train=separated_train, separated_test=separated_test, class1=1, class2=2, plot_no=plot_no)

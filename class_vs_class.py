@@ -19,7 +19,7 @@ def plot_decision_boundary(perceptron, X, y, colormap):
 	# Generate a grid of points with distance h between them
 	xx, yy = np.meshgrid(np.arange(x_min, x_max, h_x), np.arange(y_min, y_max, h_y))
 	# Predict the function value for the whole grid
-	final_y, accuracy, actual_predictions, weights = perceptron.score(np.c_[xx.ravel(), yy.ravel()])
+	final_y, accuracy, actual_predictions, weights = perceptron.score(np.c_[xx.ravel(), yy.ravel()], y)
 	Z = final_y
 	Z = Z.reshape(xx.shape)
 	# Plot the contour and training examples
@@ -81,9 +81,11 @@ def class_vs_class(separated_train, separated_test, class1, class2, plot_no):
 	perceptron.fit(X_train, y_train, 100)
 	final_y, accuracy, actual_predictions, weights = perceptron.score(X_test, y_test)
 
-	plot_decision_boundary(perceptron, X_test, y_test, colormap=ListedColormap(['r', 'g', 'b']))
 	print(f"The accuray of class {class1+1} VS class {class2+1} is {accuracy*100}%")
 	plot_result(X_test, final_y, f"class {class1+1} VS class {class2+1} Predictions on Test Dataset", plot_no+2, f"{class1+1}", f"{class2+1}")
 	
+	plt.figure(plot_no+3, figsize=(8,5))
+	plt.title(f"class {class1+1} VS class {class2+1} Decision Region on Test Dataset")
+	plot_decision_boundary(perceptron, X_test, y_test, colormap=ListedColormap(['r', 'g', 'b']))
 
 	
